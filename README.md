@@ -95,11 +95,12 @@ time, the ticket will be automatically cancelled.
   use a global lock to synchronize the state changes to the ticket objects
   and to calls to the Storage class (since none of the Storage 
   methods are thread-safe).
-* When calling the buy webservice, you MUST not wait for the results
+* When calling the buy webservice, you must NOT wait for the results
   while holding the global lock. This would block all other ticket 
   change requests and reduce your concurrency. Release the lock before
   calling the service and then reacquire the lock after the service
   call returns.
+* Use a Condition object to implement TicketManager.awaitAllBought().
 * When starting up, if there are any tickets in the BUYING state,
   finish the purchase of those tickets by calling the webservice.
 * Any tickets that were not successfully purchased by the webservice,
@@ -132,8 +133,8 @@ public class TicketManager {
     // Buys a ticket
     public String buy(String userId, String ticketId, String holdTransId)
 
-    // Returns when all tickets are sold
-    public void awaitSoldOut()
+    // Returns when all tickets are successfully sold
+    public void awaitAllBought()
 
     // Does an orderly shutdown of all the threads
     public void shutdown()
